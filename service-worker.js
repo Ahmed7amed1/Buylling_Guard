@@ -16,20 +16,21 @@ self.addEventListener('install', event => {
   );
 });
 
-// Fetch event - network first for index.html, cache fallback for others
+// Fetch event - network first for navigations, cache-first for others
 self.addEventListener('fetch', event => {
-  if (event.request.url.endsWith('index.html') || event.request.mode === 'navigate') {
+  if (event.request.mode === 'navigate') {
+    // Always try the network for page loads
     event.respondWith(
       fetch(event.request).catch(() => caches.match('./index.html'))
     );
-    return;
+  } else {
+    // Cache-first strategy for static assets
+    event.respondWith(
+      caches.match(event.request).then(response => {
+        return response || fetch(event.request);
+      })
+    );
   }
-
-  event.respondWith(
-    caches.match(event.request).then(response => {
-      return response || fetch(event.request);
-    })
-  );
 });
 
 // Activate event - clean up old caches
