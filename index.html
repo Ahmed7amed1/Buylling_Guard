@@ -4,7 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🛡️ Bullying Detector</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#667eea">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="BullyGuard">
+    <link rel="apple-touch-icon" href="https://via.placeholder.com/180x180/667eea/ffffff?text=🛡️">
+    <link rel="manifest" href="manifest.json">
+    
     <style>
+        /* Your existing CSS remains the same */
         * {
             margin: 0;
             padding: 0;
@@ -196,6 +206,24 @@
             font-size: 0.9em;
             opacity: 0.8;
         }
+        
+        /* Install button styling */
+        .install-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            font-size: 24px;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            display: none;
+            z-index: 1000;
+        }
     </style>
 </head>
 <body>
@@ -238,6 +266,9 @@
         </div>
     </div>
 
+    <!-- Install button for PWA -->
+    <button id="installBtn" class="install-btn">📲</button>
+
     <script>
         // Your Roboflow API configuration
         const ROBOFLOW_API_KEY = "1RuIGDSVW5gVOPaIq5I7";
@@ -247,6 +278,7 @@
         const loading = document.getElementById('loading');
         const results = document.getElementById('results');
         const resultsContent = document.getElementById('results-content');
+        const installBtn = document.getElementById('installBtn');
         
         fileInput.addEventListener('change', handleFileSelect);
         
@@ -444,10 +476,51 @@
             `;
         }
         
-        // Make the app work as PWA (Progressive Web App)
+        // PWA Installation Logic
+        let deferredPrompt;
+        
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // Prevent the mini-infobar from appearing on mobile
+            e.preventDefault();
+            // Stash the event so it can be triggered later
+            deferredPrompt = e;
+            // Show the install button
+            installBtn.style.display = 'block';
+            
+            installBtn.addEventListener('click', () => {
+                // Hide the install button
+                installBtn.style.display = 'none';
+                // Show the install prompt
+                deferredPrompt.prompt();
+                // Wait for the user to respond to the prompt
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log('User accepted the install prompt');
+                    } else {
+                        console.log('User dismissed the install prompt');
+                    }
+                    deferredPrompt = null;
+                });
+            });
+        });
+        
+        window.addEventListener('appinstalled', () => {
+            // Hide the install button
+            installBtn.style.display = 'none';
+            // Clear the deferredPrompt so it can be garbage collected
+            deferredPrompt = null;
+            console.log('PWA was installed');
+        });
+        
+        // Service Worker Registration
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', function() {
-                // You can add service worker registration here for offline functionality
+                navigator.serviceWorker.register('service-worker.js')
+                .then(function(registration) {
+                    console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                }, function(err) {
+                    console.log('ServiceWorker registration failed: ', err);
+                });
             });
         }
         
@@ -473,5 +546,3 @@
     </script>
 </body>
 </html>
-
-
