@@ -15,48 +15,61 @@
     
     <!-- Dynamic Icon Generation -->
     <script>
-    // Generate simple icons if they don't exist
-    document.addEventListener('DOMContentLoaded', function() {
-        if (!document.querySelector('link[href="icon-192x192.png"]')) {
-            const generateIcon = (size) => {
-                const canvas = document.createElement('canvas');
-                canvas.width = size;
-                canvas.height = size;
-                const ctx = canvas.getContext('2d');
-                
-                // Background
-                ctx.fillStyle = '#667eea';
-                ctx.fillRect(0, 0, size, size);
-                
-                // Text/Emoji
-                ctx.fillStyle = '#ffffff';
-                ctx.font = `${size/3}px Arial`;
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.fillText('🛡️', size/2, size/2);
-                
-                return canvas.toDataURL('image/png');
-            };
-            
-            // Create icon links
-            const sizes = [72, 96, 128, 144, 152, 192, 384, 512];
-            sizes.forEach(size => {
-                const link = document.createElement('link');
-                link.rel = 'icon';
-                link.sizes = `${size}x${size}`;
-                link.href = generateIcon(size);
-                document.head.appendChild(link);
-                
-                // Also create apple-touch-icon for iOS
-                if (size === 180) {
-                    const appleLink = document.createElement('link');
-                    appleLink.rel = 'apple-touch-icon';
-                    appleLink.sizes = `${size}x${size}`;
-                    appleLink.href = generateIcon(size);
-                    document.head.appendChild(appleLink);
-                }
-            });
+// Generate simple icons if they don't exist
+document.addEventListener('DOMContentLoaded', function() {
+    // Create a simple icon function
+    const generateIcon = (size) => {
+        const canvas = document.createElement('canvas');
+        canvas.width = size;
+        canvas.height = size;
+        const ctx = canvas.getContext('2d');
+        
+        // Background gradient
+        const gradient = ctx.createLinearGradient(0, 0, size, size);
+        gradient.addColorStop(0, '#667eea');
+        gradient.addColorStop(1, '#764ba2');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, size, size);
+        
+        // Draw shield shape
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.moveTo(size/2, size/8);
+        ctx.lineTo(size/4, size/3);
+        ctx.lineTo(size/4, size/1.5);
+        ctx.lineTo(size/2, size/1.2);
+        ctx.lineTo(size/1.33, size/1.5);
+        ctx.lineTo(size/1.33, size/3);
+        ctx.closePath();
+        ctx.fill();
+        
+        return canvas.toDataURL('image/png');
+    };
+    
+    // Create icon links for various sizes
+    const sizes = [72, 96, 128, 144, 152, 192, 384, 512];
+    sizes.forEach(size => {
+        const link = document.createElement('link');
+        link.rel = 'icon';
+        link.sizes = `${size}x${size}`;
+        link.href = generateIcon(size);
+        document.head.appendChild(link);
+        
+        // Also create apple-touch-icon for iOS
+        if (size === 180) {
+            const appleLink = document.createElement('link');
+            appleLink.rel = 'apple-touch-icon';
+            appleLink.sizes = `${size}x${size}`;
+            appleLink.href = generateIcon(size);
+            document.head.appendChild(appleLink);
         }
+    });
+    
+    // Also set the theme color meta tag
+    const themeMeta = document.createElement('meta');
+    themeMeta.name = 'theme-color';
+    themeMeta.content = '#667eea';
+    document.head.appendChild(themeMeta);
     });
     </script>
     
