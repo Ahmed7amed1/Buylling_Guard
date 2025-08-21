@@ -1,8 +1,8 @@
 const CACHE_NAME = 'bullyguard-v1.0';
 const urlsToCache = [
-  '/',
-  '/index.html',
-  '/manifest.json',
+  '/Buylling_Guard/',
+  '/Buylling_Guard/index.html',
+  '/Buylling_Guard/manifest.json',
   // Add other assets you might have (CSS, JS, images)
 ];
 

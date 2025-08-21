@@ -225,6 +225,40 @@
             z-index: 1000;
         }
     </style>
+	<script>
+// Generate simple icons if they don't exist
+if (!document.querySelector('link[href="icon-192x192.png"]')) {
+  const generateIcon = (size) => {
+    const canvas = document.createElement('canvas');
+    canvas.width = size;
+    canvas.height = size;
+    const ctx = canvas.getContext('2d');
+    
+    // Background
+    ctx.fillStyle = '#667eea';
+    ctx.fillRect(0, 0, size, size);
+    
+    // Text
+    ctx.fillStyle = '#ffffff';
+    ctx.font = `${size/4}px Arial`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('🛡️', size/2, size/2);
+    
+    return canvas.toDataURL('image/png');
+  };
+  
+  // Create icon links
+  const sizes = [72, 96, 128, 144, 152, 192, 384, 512];
+  sizes.forEach(size => {
+    const link = document.createElement('link');
+    link.rel = 'icon';
+    link.sizes = `${size}x${size}`;
+    link.href = generateIcon(size);
+    document.head.appendChild(link);
+  });
+}
+</script>
 </head>
 <body>
     <div class="container">
