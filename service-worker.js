@@ -1,4 +1,4 @@
-const CACHE_NAME = 'bullyguard-v2.0';
+const CACHE_NAME = 'bullyguard-v2.1';
 const urlsToCache = [
   './',
   './index.html',
@@ -52,4 +52,5 @@ self.addEventListener('activate', event => {
       );
     })
   );
+
 });
