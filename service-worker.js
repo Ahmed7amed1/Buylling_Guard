@@ -18,6 +18,7 @@ self.addEventListener('install', event => {
 
 // Fetch event - serve from cache if available
 self.addEventListener('fetch', event => {
+  // Handle requests for the root path
   if (event.request.url === new URL('./', self.location.origin).href) {
     event.respondWith(
       caches.match('./index.html')
@@ -27,10 +28,11 @@ self.addEventListener('fetch', event => {
     );
     return;
   }
-
+  
   event.respondWith(
     caches.match(event.request)
       .then(response => {
+        // Return cached version or fetch from network
         return response || fetch(event.request);
       })
   );
