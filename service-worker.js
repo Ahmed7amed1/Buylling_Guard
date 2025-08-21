@@ -1,4 +1,4 @@
-const CACHE_NAME = 'bullyguard-v2.0';
+const CACHE_NAME = 'bullyguard-v2.1';
 const urlsToCache = [
   './',
   './index.html',
@@ -16,25 +16,19 @@ self.addEventListener('install', event => {
   );
 });
 
-// Fetch event - serve from cache if available
+// Fetch event - network first for index.html, cache fallback for others
 self.addEventListener('fetch', event => {
-  // Handle requests for the root path
-  if (event.request.url === new URL('./', self.location.origin).href) {
+  if (event.request.url.endsWith('index.html') || event.request.mode === 'navigate') {
     event.respondWith(
-      caches.match('./index.html')
-        .then(response => {
-          return response || fetch(event.request);
-        })
+      fetch(event.request).catch(() => caches.match('./index.html'))
     );
     return;
   }
-  
+
   event.respondWith(
-    caches.match(event.request)
-      .then(response => {
-        // Return cached version or fetch from network
-        return response || fetch(event.request);
-      })
+    caches.match(event.request).then(response => {
+      return response || fetch(event.request);
+    })
   );
 });
 
