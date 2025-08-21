@@ -448,45 +448,67 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         async function analyzeImage(file) {
-            loading.style.display = 'block';
-            results.style.display = 'none';
-            
-            try {
-                // Create FormData for multipart upload
-                const formData = new FormData();
-                formData.append('file', file);
-                
-                // Add timeout to fetch request
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
-                
-                // Make API call to Roboflow
-                const response = await fetch(`${MODEL_ENDPOINT}?api_key=${ROBOFLOW_API_KEY}&confidence=40&overlap=30`, {
-                    method: 'POST',
-                    body: formData,
-                    signal: controller.signal
-                });
-                
-                clearTimeout(timeoutId);
-                
-                if (!response.ok) {
-                    throw new Error(`API request failed: ${response.status}`);
-                }
-                
-                const result = await response.json();
-                displayResults(result);
-                
-            } catch (error) {
-                console.error('Error:', error);
-                if (error.name === 'AbortError') {
-                    displayError('Request timeout. Please check your internet connection and try again.');
-                } else {
-                    displayError('Analysis failed. Please check your internet connection and try again.');
-                }
-            } finally {
-                loading.style.display = 'none';
+    loading.style.display = 'block';
+    results.style.display = 'none';
+
+    try {
+        const img = await createImageBitmap(file);
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+
+        const maxSize = 1024;
+        let { width, height } = img;
+
+        if (width > height) {
+            if (width > maxSize) {
+                height = Math.round(height * (maxSize / width));
+                width = maxSize;
+            }
+        } else {
+            if (height > maxSize) {
+                width = Math.round(width * (maxSize / height));
+                height = maxSize;
             }
         }
+
+        canvas.width = width;
+        canvas.height = height;
+        ctx.drawImage(img, 0, 0, width, height);
+
+        const blob = await new Promise(resolve =>
+            canvas.toBlob(resolve, "image/jpeg", 0.8)
+        );
+
+        const formData = new FormData();
+        formData.append('file', blob, "photo.jpg");
+
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 30000);
+
+        const response = await fetch(`${MODEL_ENDPOINT}?api_key=${ROBOFLOW_API_KEY}&confidence=40&overlap=30`, {
+            method: 'POST',
+            body: formData,
+            signal: controller.signal
+        });
+
+        clearTimeout(timeoutId);
+
+        if (!response.ok) throw new Error(`API request failed: ${response.status}`);
+
+        const result = await response.json();
+        displayResults(result);
+
+    } catch (error) {
+        console.error('Error:', error);
+        if (error.name === 'AbortError') {
+            displayError('Request timeout. Please check your internet connection and try again.');
+        } else {
+            displayError('Analysis failed. Please try again.');
+        }
+    } finally {
+        loading.style.display = 'none';
+    }
+}
         
         function displayResults(result) {
             results.style.display = 'block';
@@ -636,4 +658,5 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('🚀 Bullying Detection App Loaded Successfully!');
     </script>
 </body>
+
 </html>
