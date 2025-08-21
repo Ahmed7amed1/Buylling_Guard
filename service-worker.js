@@ -1,9 +1,8 @@
-const CACHE_NAME = 'bullyguard-v1.0';
+const CACHE_NAME = 'bullyguard-v2.0';
 const urlsToCache = [
-  '/Buylling_Guard/',
-  '/Buylling_Guard/index.html',
-  '/Buylling_Guard/manifest.json',
-  // Add other assets you might have (CSS, JS, images)
+  './',
+  './index.html',
+  './manifest.json'
 ];
 
 // Install event - cache essential files
@@ -19,6 +18,17 @@ self.addEventListener('install', event => {
 
 // Fetch event - serve from cache if available
 self.addEventListener('fetch', event => {
+  // Handle requests for the root path
+  if (event.request.url === new URL('./', self.location.origin).href) {
+    event.respondWith(
+      caches.match('./index.html')
+        .then(response => {
+          return response || fetch(event.request);
+        })
+    );
+    return;
+  }
+  
   event.respondWith(
     caches.match(event.request)
       .then(response => {
