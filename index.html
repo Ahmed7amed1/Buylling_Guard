@@ -1,142 +1,967 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BullyGuard</title>
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#667eea">
-  <style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>🛡️ BullyGuard Anti-Bullying AI</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#667eea" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="BullyGuard" />
+    <link rel="manifest" href="manifest.json" />
+    <style>
+    /* Original styles preserved */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    
     body {
-      font-family: Arial, sans-serif;
-      background: linear-gradient(135deg,#667eea,#764ba2);
-      color: #fff;
-      margin: 0; padding: 20px;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 20px;
+        color: white;
+        position: relative;
     }
-    .container { max-width: 420px; margin: auto; }
-    .btn {
-      width: 100%; padding: 14px; border: none; border-radius: 25px;
-      margin-top: 10px; font-weight: bold; cursor: pointer;
+    
+    .container {
+        max-width: 400px;
+        margin: 0 auto;
+        padding: 20px;
     }
-    .btn-camera { background: #ff6b6b; color:#fff; }
-    .btn-gallery { background: #4ecdc4; color:#fff; }
-    .results-section, #report-section {
-      background: rgba(255,255,255,0.1);
-      border-radius: 15px; padding: 15px; margin-top: 20px;
-      display: none;
+    
+    .header {
+        text-align: center;
+        margin-bottom: 30px;
     }
-    #locationInput {
-      width: 100%; padding: 10px; border-radius: 8px; margin-bottom: 10px;
-      border: none;
+    
+    .title {
+        font-size: 2.2em;
+        font-weight: bold;
+        margin-bottom: 10px;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
     }
+    
+    .subtitle {
+        font-size: 1.1em;
+        opacity: 0.9;
+        margin-bottom: 30px;
+    }
+
+    /* Camera section and upload area */
+    .camera-section {
+        background: rgba(255,255,255,0.1);
+        border-radius: 20px;
+        padding: 30px 20px;
+        margin-bottom: 20px;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,0.2);
+    }
+
     .upload-area {
-      border: 2px dashed rgba(255,255,255,0.6); border-radius: 15px;
-      text-align: center; padding: 40px 20px; cursor: pointer;
+        border: 3px dashed rgba(255,255,255,0.5);
+        border-radius: 15px;
+        padding: 40px 20px;
+        text-align: center;
+        margin-bottom: 20px;
+        transition: all 0.3s ease;
+        cursor: pointer;
     }
-    .preview-image { max-width: 100%; margin-top: 15px; border-radius: 8px; }
-  </style>
+
+    .upload-area:hover, .upload-area.drag-over {
+        border-color: #fff;
+        background: rgba(255,255,255,0.1);
+    }
+
+    .upload-icon {
+        font-size: 3em;
+        margin-bottom: 15px;
+        opacity: 0.8;
+    }
+
+    .upload-text {
+        font-size: 1.1em;
+        margin-bottom: 10px;
+    }
+
+    .upload-subtext {
+        font-size: 0.9em;
+        opacity: 0.7;
+    }
+
+    /* Buttons */
+    .btn {
+        width: 100%;
+        padding: 15px;
+        border: none;
+        border-radius: 25px;
+        font-size: 1.1em;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
+    .btn-camera {
+        background: linear-gradient(45deg, #ff6b6b, #ee5a52);
+        color: white;
+    }
+    .btn-gallery {
+        background: linear-gradient(45deg, #4ecdc4, #44a08d);
+        color: white;
+    }
+    .btn-report {
+        background: linear-gradient(45deg, #e74c3c, #c0392b);
+        color: white;
+        margin-top: 15px;
+    }
+    .btn-alert {
+        background: linear-gradient(45deg, #f39c12, #e67e22);
+        color: white;
+    }
+    .btn-emergency {
+        background: linear-gradient(45deg, #e74c3c, #c0392b);
+        color: white;
+        animation: pulse 2s infinite;
+    }
+
+    .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    }
+    .btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    /* Results section */
+    .results-section {
+        background: rgba(255,255,255,0.1);
+        border-radius: 20px;
+        padding: 20px;
+        margin-top: 20px;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,0.2);
+        display: none;
+    }
+    .results-title {
+        font-size: 1.3em;
+        font-weight: bold;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .result-item {
+        background: rgba(255,255,255,0.1);
+        padding: 15px;
+        border-radius: 10px;
+        margin-bottom: 10px;
+    }
+    .result-safe {
+        border-left: 4px solid #2ecc71;
+    }
+    .result-warning {
+        border-left: 4px solid #f39c12;
+    }
+    .result-danger {
+        border-left: 4px solid #e74c3c;
+    }
+
+    /* Loading spinner */
+    .loading {
+        display: none;
+        text-align: center;
+        padding: 20px;
+    }
+    .spinner {
+        border: 4px solid rgba(255,255,255,0.3);
+        border-radius: 50%;
+        border-top: 4px solid white;
+        width: 50px;
+        height: 50px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 15px;
+    }
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    @keyframes pulse {
+        0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.7); }
+        70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(231, 76, 60, 0); }
+        100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(231, 76, 60, 0); }
+    }
+
+    .preview-image {
+        max-width: 100%;
+        max-height: 300px;
+        border-radius: 10px;
+        margin: 15px 0;
+    }
+
+    #file-input-camera, #file-input-gallery {
+        display: none;
+    }
+    .status-text {
+        text-align: center;
+        margin-top: 15px;
+        font-size: 0.9em;
+        opacity: 0.8;
+    }
+    /* Install button styling */
+    .install-btn {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: rgba(255,255,255,0.2);
+        border: none;
+        border-radius: 50%;
+        width: 60px;
+        height: 60px;
+        font-size: 24px;
+        cursor: pointer;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        display: none;
+        z-index: 1000;
+        color: white;
+    }
+    /* Network error message */
+    .network-error {
+        text-align: center;
+        padding: 15px;
+        background: rgba(231, 76, 60, 0.2);
+        border-radius: 10px;
+        margin-top: 15px;
+        border-left: 4px solid #e74c3c;
+    }
+    /* Report modal */
+    .report-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.7);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 2000;
+    }
+    .report-content {
+        background: white;
+        border-radius: 15px;
+        padding: 25px;
+        width: 90%;
+        max-width: 400px;
+        color: #333;
+        max-height: 80vh;
+        overflow-y: auto;
+    }
+    .report-title {
+        font-size: 1.4em;
+        font-weight: bold;
+        margin-bottom: 15px;
+        color: #e74c3c;
+        text-align: center;
+    }
+    .report-option {
+        padding: 15px;
+        margin: 10px 0;
+        border: 2px solid #ddd;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    .report-option:hover {
+        border-color: #667eea;
+        background: #f8f9fa;
+    }
+    .report-option h3 {
+        margin: 0 0 8px 0;
+        font-size: 1.1em;
+    }
+    .report-option p {
+        margin: 0;
+        font-size: 0.9em;
+        color: #666;
+    }
+    .close-modal {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        background: none;
+        border: none;
+        font-size: 1.5em;
+        cursor: pointer;
+        color: #999;
+    }
+    /* Alert sound controls */
+    .alert-controls {
+        display: flex;
+        gap: 10px;
+        margin-top: 15px;
+    }
+    .alert-btn {
+        flex: 1;
+        padding: 10px;
+    }
+    /* NEW: Quick actions section */
+    .quick-actions {
+        background: rgba(255,255,255,0.1);
+        border-radius: 20px;
+        padding: 20px;
+        margin-bottom: 20px;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,0.2);
+    }
+    .quick-actions-title {
+        font-size: 1.2em;
+        font-weight: bold;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    /* NEW: History section */
+    .history-section {
+        background: rgba(255,255,255,0.1);
+        border-radius: 20px;
+        padding: 20px;
+        margin-top: 20px;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,0.2);
+        display: none;
+    }
+    .history-item {
+        background: rgba(255,255,255,0.1);
+        padding: 12px;
+        border-radius: 10px;
+        margin-bottom: 10px;
+        font-size: 0.9em;
+    }
+    .history-time {
+        font-size: 0.8em;
+        opacity: 0.7;
+        margin-top: 5px;
+    }
+    /* Emergency contact chips */
+    .emergency-contacts {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 15px;
+        color: white;
+    }
+    .contact-chip {
+        background: rgba(231, 76, 60, 0.3);
+        padding: 8px 15px;
+        border-radius: 20px;
+        font-size: 0.9em;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        color: white;
+    }
+    .contact-chip:hover {
+        background: rgba(231, 76, 60, 0.5);
+        transform: translateY(-2px);
+    }
+    /* Add contact inputs styled to blend */
+    .contact-input {
+        margin-top: 5px;
+        padding: 8px;
+        width: 70%;
+        border-radius: 8px;
+        border: none;
+        font-size: 0.9em;
+    }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <h1>🛡️ BullyGuard</h1>
-    <p>Detect and Report Bullying</p>
+    <div class="container">
+        <div class="header">
+            <div class="title">🛡️ Anti-Bullying AI</div>
+            <div class="subtitle">Keep schools safe with AI technology</div>
+        </div>
 
-    <!-- Upload -->
-    <div class="upload-area" id="upload-area">
-      <p>📸 Tap to take or upload a photo</p>
-    </div>
-    <input type="file" id="file-input-camera" accept="image/*" capture="environment" hidden>
-    <input type="file" id="file-input-gallery" accept="image/*" hidden>
-    <button class="btn btn-camera" onclick="takePhoto()">📷 Take Photo</button>
-    <button class="btn btn-gallery" onclick="openGallery()">🖼️ Choose from Gallery</button>
+        <!-- Quick Actions Section -->
+        <div class="quick-actions">
+            <div class="quick-actions-title">⚡ Quick Actions</div>
+            <button class="btn btn-emergency" onclick="triggerEmergencyAlert()">🚨 Emergency Alert</button>
+            <button class="btn btn-alert" onclick="showHistory()">📋 View History</button>
+        </div>
 
-    <!-- Loading -->
-    <div id="loading" style="display:none;text-align:center;">
-      <p>🔍 Analyzing...</p>
+        <div class="camera-section">
+            <div class="upload-area" id="upload-area">
+                <div class="upload-icon">📸</div>
+                <div class="upload-text">Tap to take photo or upload image</div>
+                <div class="upload-subtext">JPG, PNG, WebP supported</div>
+            </div>
+
+            <input type="file" id="file-input-camera" accept="image/*" capture="environment" />
+            <input type="file" id="file-input-gallery" accept="image/*" />
+
+            <button class="btn btn-camera" onclick="takePhoto()">📷 Take Photo</button>
+            <button class="btn btn-gallery" onclick="openGallery()">🖼️ Choose from Gallery</button>
+        </div>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <div>🔍 Analyzing image for bullying...</div>
+            <div class="status-text">This may take a few seconds</div>
+        </div>
+
+        <div class="results-section" id="results">
+            <div class="results-title">📊 Detection Results</div>
+            <div id="results-content"></div>
+            <div id="report-section" style="display: none;">
+                <button class="btn btn-report" onclick="showReportOptions()">🚨 Report Incident</button>
+                <div class="alert-controls">
+                    <button class="btn btn-alert alert-btn" onclick="playAlertSound()">🔔 Play Alert Sound</button>
+                    <button class="btn btn-alert alert-btn" onclick="stopAlertSound()">🔕 Stop Sound</button>
+                </div>
+                <!-- Emergency contacts display and add -->
+                <div style="margin-top: 15px;">
+                    <div style="font-weight: bold; margin-bottom: 10px;">📞 Emergency Contacts:</div>
+                    <div class="emergency-contacts"></div>
+                    <input class="contact-input" type="text" id="newContactName" placeholder="Contact name" />
+                    <input class="contact-input" type="tel" id="newContactNumber" placeholder="Phone number" />
+                    <button class="btn btn-alert" onclick="addContact()">➕ Add Contact</button>
+                    <div style="margin-top: 8px;">
+                        <div class="contact-chip" onclick="contactSecurity()">Security</div>
+                        <div class="contact-chip" onclick="contactCounselor()">Counselor</div>
+                        <div class="contact-chip" onclick="contactPrincipal()">Principal</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="history-section" id="history-section">
+            <div class="results-title">📋 Scan History</div>
+            <div id="history-content">
+                <div class="history-item">
+                    <div>No scans recorded yet</div>
+                    <div class="history-time">Start scanning to see history</div>
+                </div>
+            </div>
+            <button class="btn" onclick="hideHistory()" style="background: rgba(255,255,255,0.2);">
+                ← Back to Scanner
+            </button>
+        </div>
     </div>
 
-    <!-- Results -->
-    <div id="results" class="results-section">
-      <h3>📊 Detection Results</h3>
-      <div id="results-content"></div>
+    <!-- Report Modal -->
+    <div id="reportModal" class="report-modal">
+        <div class="report-content">
+            <button class="close-modal" onclick="closeReportModal()">×</button>
+            <h2 class="report-title">Report Bullying Incident</h2>
+            <div class="report-option" onclick="reportViaSMS()">📱 Send SMS Report</div>
+            <p>Send an immediate alert to school authorities via text message</p>
+            <div class="report-option" onclick="reportViaEmail()">✉️ Send Email Report</div>
+            <p>Send a detailed report to the school administration email</p>
+            <div class="report-option" onclick="makeAnonymousReport()">🕵️ Anonymous Report</div>
+            <p>Submit a report without revealing your identity</p>
+            <div class="report-option" onclick="alert('Future enhancement: This will connect directly to school security when implemented')">🚓 Emergency Contact</div>
+            <p>Directly contact school security (future enhancement)</p>
+        </div>
     </div>
 
-    <!-- Report Bullying -->
-    <div id="report-section">
-      <input type="text" id="locationInput" placeholder="Enter location (e.g. Class 5A)">
-      <button class="btn btn-camera" onclick="reportBullying()">📨 Report Bullying</button>
-    </div>
-  </div>
+    <!-- Install button for PWA -->
+    <button id="installBtn" class="install-btn">📲</button>
 
 <script>
-const ROBOFLOW_API_KEY = "1RuIGDSVW5gVOPaIq5I7";
-const MODEL_ENDPOINT = "https://detect.roboflow.com/bullying-detection-lixke-xxmrf/1";
+    // Original API config & elements
+    const ROBOFLOW_API_KEY = "1RuIGDSVW5gVOPaIq5I7";
+    const MODEL_ENDPOINT = "https://detect.roboflow.com/bullying-detection-lixke-xxmrf/1";
 
-const fileInputCamera = document.getElementById('file-input-camera');
-const fileInputGallery = document.getElementById('file-input-gallery');
-const uploadArea = document.getElementById('upload-area');
-const loading = document.getElementById('loading');
-const results = document.getElementById('results');
-const resultsContent = document.getElementById('results-content');
+    const fileInputCamera = document.getElementById('file-input-camera');
+    const fileInputGallery = document.getElementById('file-input-gallery');
+    const loading = document.getElementById('loading');
+    const results = document.getElementById('results');
+    const resultsContent = document.getElementById('results-content');
+    const installBtn = document.getElementById('installBtn');
+    const uploadArea = document.getElementById('upload-area');
+    const reportSection = document.getElementById('report-section');
+    const reportModal = document.getElementById('reportModal');
+    const historySection = document.getElementById('history-section');
+    const historyContent = document.getElementById('history-content');
 
-fileInputCamera.addEventListener('change', e => handleFile(e.target.files[0]));
-fileInputGallery.addEventListener('change', e => handleFile(e.target.files[0]));
+    // Alert sound variables
+    let alertSound = null;
+    let alertInterval = null;
 
-uploadArea.addEventListener('click', ()=> fileInputGallery.click());
+    // Scan history
+    let scanHistory = [];
 
-function takePhoto(){ fileInputCamera.click(); }
-function openGallery(){ fileInputGallery.click(); }
+    // School fallback contacts
+    const SCHOOL_CONTACTS = {
+        sms: "555-0123",
+        email: "safety@school.edu",
+        authorities: ["Principal", "School Counselor", "Security Officer"]
+    };
 
-function handleFile(file){
-  if(!file) return;
-  if(!file.type.startsWith("image/")){ alert("Please select an image"); return; }
-  const reader=new FileReader();
-  reader.onload = e => showPreview(e.target.result);
-  reader.readAsDataURL(file);
-  analyzeImage(file);
-}
-function showPreview(src){
-  document.querySelectorAll(".preview-image").forEach(el=>el.remove());
-  const img=document.createElement("img");
-  img.src=src; img.className="preview-image";
-  uploadArea.appendChild(img);
-}
-async function analyzeImage(file){
-  loading.style.display="block"; results.style.display="none";
-  try {
-    const formData=new FormData(); formData.append("file",file);
-    const resp=await fetch(`${MODEL_ENDPOINT}?api_key=${ROBOFLOW_API_KEY}&confidence=40&overlap=30`,{
-      method:"POST", body:formData
+    // Preloaded emergency contacts or from localStorage
+    let emergencyContacts = JSON.parse(localStorage.getItem("emergencyContacts")) || [
+        { name: "Contact 1", number: "01142264300" },
+        { name: "Contact 2", number: "01224346773" },
+        { name: "Contact 3", number: "01113612839" },
+        { name: "Contact 4", number: "01551314842" }
+    ];
+
+    // Event listeners for file inputs
+    fileInputCamera.addEventListener('change', handleFileSelect);
+    fileInputGallery.addEventListener('change', handleFileSelect);
+
+    // Drag and drop functionality
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        uploadArea.addEventListener(eventName, preventDefaults, false);
+        document.body.addEventListener(eventName, preventDefaults, false);
     });
-    if(!resp.ok) throw new Error("API failed");
-    const result=await resp.json();
-    displayResults(result);
-  } catch(err){
-    resultsContent.innerText="❌ Error: "+err.message;
-    results.style.display="block";
-  } finally {
-    loading.style.display="none";
-  }
-}
-function displayResults(result){
-  results.style.display="block"; resultsContent.innerHTML="";
-  if(result.predictions && result.predictions.length>0){
-    const div=document.createElement("div");
-    div.innerHTML=`🚨 Bullying Detected! Found ${result.predictions.length} incident(s).`;
-    resultsContent.appendChild(div);
-  } else {
-    resultsContent.innerText="✅ No bullying detected.";
-  }
-  document.getElementById("report-section").style.display="block";
-}
-function reportBullying(){
-  const loc=document.getElementById("locationInput").value.trim();
-  if(!loc){ alert("Enter location first."); return; }
-  let text="🚨 Bullying Report\nLocation: "+loc+"\n\nResults:\n";
-  text+=resultsContent.innerText || "No results.";
-  const phone="1234567890"; // change this to hotline #
-  window.location.href=`sms:${phone}?body=${encodeURIComponent(text)}`;
-}
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+        uploadArea.addEventListener(eventName, highlight, false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+        uploadArea.addEventListener(eventName, unhighlight, false);
+    });
+
+    uploadArea.addEventListener('drop', handleDrop, false);
+
+    function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    function highlight(e) {
+        uploadArea.classList.add('drag-over');
+    }
+
+    function unhighlight(e) {
+        uploadArea.classList.remove('drag-over');
+    }
+
+    function handleDrop(e) {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        if (files.length > 0) {
+            handleFile(files[0]);
+        }
+    }
+
+    function takePhoto() {
+        fileInputCamera.click();
+    }
+
+    function openGallery() {
+        fileInputGallery.click();
+    }
+
+    function handleFileSelect(event) {
+        const file = event.target.files[0];
+        if (file) {
+            handleFile(file);
+            event.target.value = '';
+        }
+    }
+
+    function handleFile(file) {
+        if (!file.type.startsWith('image/')) {
+            alert('Please select an image file');
+            return;
+        }
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            showPreview(e.target.result);
+        };
+        reader.readAsDataURL(file);
+        analyzeImage(file);
+    }
+
+    function showPreview(imageSrc) {
+        const existingPreview = document.querySelector('.preview-image');
+        if (existingPreview) existingPreview.remove();
+        const img = document.createElement('img');
+        img.src = imageSrc;
+        img.className = 'preview-image';
+        img.alt = 'Selected image';
+        uploadArea.appendChild(img);
+    }
+
+    async function analyzeImage(file) {
+        loading.style.display = 'block';
+        results.style.display = 'none';
+        reportSection.style.display = 'none';
+        historySection.style.display = 'none';
+        try {
+            const formData = new FormData();
+            formData.append('file', file);
+
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 30000);
+
+            const response = await fetch(`${MODEL_ENDPOINT}?api_key=${ROBOFLOW_API_KEY}&confidence=40&overlap=30`, {
+                method: 'POST',
+                body: formData,
+                signal: controller.signal,
+            });
+            clearTimeout(timeoutId);
+            if (!response.ok) throw new Error(`API request failed: ${response.status}`);
+
+            const result = await response.json();
+            addToHistory(result);
+            displayResults(result);
+        } catch (error) {
+            console.error('Error:', error);
+            if (error.name === 'AbortError') {
+                displayError('Request timeout. Please check your internet connection and try again.');
+            } else {
+                displayError('Analysis failed. Please check your internet connection and try again.');
+            }
+        } finally {
+            loading.style.display = 'none';
+        }
+    }
+
+    function displayResults(result) {
+        results.style.display = 'block';
+        resultsContent.innerHTML = '';
+        if (result.predictions && result.predictions.length > 0) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'result-item result-danger';
+            alertDiv.innerHTML = `
+                <div style="font-size: 1.2em; font-weight: bold; margin-bottom: 10px;">
+                    🚨 BULLYING DETECTED!
+                </div>
+                <div style="margin-bottom: 15px;">
+                    Found ${result.predictions.length} potential incident(s):
+                </div>
+            `;
+            const predictionTypes = {};
+            result.predictions.forEach(prediction => {
+                const confidence = Math.round(prediction.confidence * 100);
+                const className = prediction.class;
+                if (!predictionTypes[className]) {
+                    predictionTypes[className] = { count: 0, maxConfidence: 0 };
+                }
+                predictionTypes[className].count++;
+                predictionTypes[className].maxConfidence = Math.max(predictionTypes[className].maxConfidence, confidence);
+                const detectionDiv = document.createElement('div');
+                detectionDiv.style.cssText = 'background: rgba(231,76,60,0.2); padding: 10px; border-radius: 8px; margin-bottom: 8px;';
+                detectionDiv.innerHTML = `<strong>${className}</strong><br><span style="font-size: 0.9em;">Confidence: ${confidence}%</span>`;
+                alertDiv.appendChild(detectionDiv);
+            });
+            const typesDiv = document.createElement('div');
+            typesDiv.style.cssText = 'margin: 15px 0; padding: 10px; background: rgba(255,255,255,0.1); border-radius: 8px;';
+            typesDiv.innerHTML = '<strong>Detection Summary:</strong><br>';
+            Object.keys(predictionTypes).forEach(type => {
+                typesDiv.innerHTML += `• ${type}: ${predictionTypes[type].count} instance(s) (up to ${predictionTypes[type].maxConfidence}% confidence)<br>`;
+            });
+            alertDiv.appendChild(typesDiv);
+            alertDiv.innerHTML += `
+                <div style="margin-top: 15px; font-size: 0.9em; opacity: 0.9;">
+                    ⚠️ Please report this incident to school authorities immediately.
+                </div>
+            `;
+            resultsContent.appendChild(alertDiv);
+            reportSection.style.display = 'block';
+        } else {
+            const safeDiv = document.createElement('div');
+            safeDiv.className = 'result-item result-safe';
+            safeDiv.innerHTML = `
+                <div style="font-size: 1.2em; font-weight: bold; margin-bottom: 10px;">
+                    ✅ All Clear!
+                </div>
+                <div>No signs of bullying detected in this image.</div>
+                <div style="margin-top: 10px; font-size: 0.9em; opacity: 0.8;">
+                    The environment appears safe and positive.
+                </div>
+            `;
+            resultsContent.appendChild(safeDiv);
+        }
+        const timestamp = new Date().toLocaleString();
+        const timeDiv = document.createElement('div');
+        timeDiv.style.cssText = 'text-align: center; margin-top: 15px; font-size: 0.8em; opacity: 0.7;';
+        timeDiv.textContent = `Analyzed on ${timestamp}`;
+        resultsContent.appendChild(timeDiv);
+    }
+
+    function displayError(message) {
+        results.style.display = 'block';
+        resultsContent.innerHTML = `
+            <div class="result-item result-warning">
+                <div style="font-size: 1.2em; font-weight: bold; margin-bottom: 10px;">
+                    ⚠️ Analysis Error
+                </div>
+                <div>${message}</div>
+                <div style="margin-top: 10px; font-size: 0.9em; opacity: 0.8;">
+                    Please try again or contact support if the problem persists.
+                </div>
+            </div>
+        `;
+    }
+
+    function addToHistory(result) {
+        const historyItem = {
+            timestamp: new Date(),
+            hasDetection: result.predictions && result.predictions.length > 0,
+            detectionCount: result.predictions ? result.predictions.length : 0,
+            predictions: result.predictions || []
+        };
+        scanHistory.unshift(historyItem);
+        if (scanHistory.length > 10) scanHistory.pop();
+        updateHistoryDisplay();
+    }
+
+    function updateHistoryDisplay() {
+        if (scanHistory.length === 0) {
+            historyContent.innerHTML = `
+                <div class="history-item">
+                    <div>No scans recorded yet</div>
+                    <div class="history-time">Start scanning to see history</div>
+                </div>
+            `;
+            return;
+        }
+        historyContent.innerHTML = '';
+        scanHistory.forEach(item => {
+            const historyItem = document.createElement('div');
+            historyItem.className = 'history-item';
+            if (item.hasDetection) {
+                historyItem.innerHTML = `
+                    <div style="color: #e74c3c; font-weight: bold;">🚨 ${item.detectionCount} bullying incident(s) detected</div>
+                    <div class="history-time">${item.timestamp.toLocaleString()}</div>
+                `;
+                historyItem.style.borderLeft = '4px solid #e74c3c';
+            } else {
+                historyItem.innerHTML = `
+                    <div style="color: #2ecc71; font-weight: bold;">✅ No bullying detected</div>
+                    <div class="history-time">${item.timestamp.toLocaleString()}</div>
+                `;
+                historyItem.style.borderLeft = '4px solid #2ecc71';
+            }
+            historyContent.appendChild(historyItem);
+        });
+    }
+
+    function showHistory() {
+        results.style.display = 'none';
+        historySection.style.display = 'block';
+        updateHistoryDisplay();
+    }
+
+    function hideHistory() {
+        historySection.style.display = 'none';
+        results.style.display = 'block';
+    }
+
+    // Emergency alert function
+    function triggerEmergencyAlert() {
+        if (confirm("🚨 EMERGENCY ALERT!\n\nThis will immediately notify school authorities of an emergency situation. Are you sure you want to proceed?")) {
+            playAlertSound();
+            const emergencyMessage = `🚨 EMERGENCY ALERT: User has triggered an emergency alert. Immediate assistance required. Location: School premises. Time: ${new Date().toLocaleString()}`;
+            const smsUrl = `sms:${SCHOOL_CONTACTS.sms}?body=${encodeURIComponent(emergencyMessage)}`;
+            window.location.href = smsUrl;
+            alert("Emergency alert activated! Authorities have been notified.");
+        }
+    }
+
+    // Emergency contact fixed functions
+    function contactSecurity() {
+        alert("Contacting school security...\n\nThis would connect to security in a real implementation.");
+    }
+
+    function contactCounselor() {
+        alert("Contacting school counselor...\n\nThis would connect to a counselor in a real implementation.");
+    }
+
+    function contactPrincipal() {
+        alert("Contacting principal...\n\nThis would connect to the principal in a real implementation.");
+    }
+
+    // Report modal controls
+    function showReportOptions() {
+        reportModal.style.display = 'flex';
+    }
+
+    function closeReportModal() {
+        reportModal.style.display = 'none';
+    }
+
+    // Location helper - returns Google Maps URL for better clarity
+    function getUserLocation(callback) {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                pos => {
+                    const mapsLink = `https://maps.google.com/?q=${pos.coords.latitude},${pos.coords.longitude}`;
+                    callback(mapsLink);
+                },
+                () => callback("Location not available")
+            );
+        } else callback("Geolocation not supported");
+    }
+
+    // Build recipients list from saved emergency contacts, fallback to school SMS
+    function buildRecipients() {
+        if (emergencyContacts.length > 0) {
+            return emergencyContacts.map(c => c.number).join(",");
+        }
+        return SCHOOL_CONTACTS.sms;
+    }
+
+    // Report via SMS to emergency contacts or school
+    function reportViaSMS(anonymous = false) {
+        getUserLocation(location => {
+            const header = anonymous
+                ? "🚨 Anonymous Bullying Report"
+                : "🚨 BULLYING ALERT: Incident detected";
+
+            const message = `${header}\nTime: ${new Date().toLocaleString()}\nLocation: ${location}`;
+            const recipients = buildRecipients();
+            const smsUrl = `sms:${recipients}?body=${encodeURIComponent(message)}`;
+            window.location.href = smsUrl;
+            closeReportModal();
+        });
+    }
+
+    // Report via Email to school email
+    function reportViaEmail() {
+        getUserLocation(location => {
+            const subject = "🚨 Bullying Incident Report";
+            const body = `Bullying Detection System Alert:\n\nTime: ${new Date().toLocaleString()}\nLocation: ${location}\n\nPlease investigate this matter immediately.\n\n--\nSent via BullyGuard App`;
+            const mailUrl = `mailto:${SCHOOL_CONTACTS.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            window.location.href = mailUrl;
+            closeReportModal();
+        });
+    }
+
+    // Anonymous report calls SMS report with anonymous flag
+    function makeAnonymousReport() {
+        reportViaSMS(true);
+    }
+
+    // Alert Sound Functions
+    function playAlertSound() {
+        try {
+            stopAlertSound();
+
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+
+            oscillator.type = 'sine';
+            oscillator.frequency.value = 800;
+            gainNode.gain.value = 0.3;
+
+            oscillator.start();
+
+            alertSound = { oscillator, gainNode, audioContext };
+
+            alertInterval = setInterval(() => {
+                try {
+                    oscillator.stop();
+                    oscillator.start();
+                } catch(e) {
+                    console.log("Sound playback completed");
+                }
+            }, 1000);
+        } catch (error) {
+            console.error('Error playing alert sound:', error);
+            alert('Could not play alert sound. Your browser may not support this feature.');
+        }
+    }
+
+    function stopAlertSound() {
+        if (alertSound) {
+            try {
+                alertSound.oscillator.stop();
+                alertSound.audioContext.close();
+            } catch(e) {
+                console.log("Error stopping sound:", e);
+            }
+            alertSound = null;
+        }
+        if (alertInterval) {
+            clearInterval(alertInterval);
+            alertInterval = null;
+        }
+    }
+
+    // Managing emergency contacts list in localStorage
+    function renderContacts() {
+        const container = document.querySelector('.emergency-contacts');
+        if (!container) return;
+        container.innerHTML = '';
+        emergencyContacts.forEach(c => {
+            const chip = document.createElement('div');
+            chip.className = 'contact-chip';
+            chip.textContent = c.name;
+            chip.title = c.number;
+            chip.onclick = () => {
+                const smsUrl = `sms:${c.number}?body=${encodeURIComponent("🚨 Emergency Alert from BullyGuard!")}`;
+                window.location.href = smsUrl;
+            };
+            container.appendChild(chip);
+        });
+    }
+
+    function addContact() {
+        const name = document.getElementById("newContactName").value.trim();
+        const number = document.getElementById("newContactNumber").value.trim();
+        if (name && number) {
+            emergencyContacts.push({name, number});
+            localStorage.setItem("emergencyContacts", JSON.stringify(emergencyContacts));
+            renderContacts();
+            document.getElementById("newContactName").value = "";
+            document.getElementById("newContactNumber").value = "";
+        } else {
+            alert("Please enter both name and number.");
+        }
+    }
+
+    window.addEventListener("load", renderContacts);
+
+    // PWA Installation prompt handling
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        installBtn.style.display = 'block';
+        installBtn.addEventListener('click', () => {
+            e.prompt();
+            installBtn.style.display = 'none';
+        });
+    });
+
+    // Service worker registration for PWA
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('service-worker.js')
+            .then(registration => {
+                console.log('SW registered: ', registration);
+            })
+            .catch(registrationError => {
+                console.log('SW registration failed: ', registrationError);
+            });
+        });
+    }
+
+    // Upload area click prompts photo or gallery selection
+    uploadArea.addEventListener('click', () => {
+        const option = confirm("Choose an option:\n\nOK - Take Photo\nCancel - Choose from Gallery");
+        if (option) takePhoto();
+        else openGallery();
+    });
 </script>
 </body>
 </html>
